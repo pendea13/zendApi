@@ -1,0 +1,57 @@
+<?php
+/**
+ * Local configuration.
+ *
+ * Copy this file to `local.php` and change its settings as required.
+ * `local.php` is ignored by git and safe to use for local and sensitive data like usernames and passwords.
+ */
+
+declare(strict_types=1);
+
+$dbParams = require __DIR__ . '/db.local.php';
+
+return [
+    'authentication' => [
+        'private_key'    => [
+            'key_or_path' => getcwd() . '/data/oauth/private.key',
+            'key_permissions_check' => false
+        ],
+        'public_key'     => getcwd() . '/data/oauth/public.key',
+        'encryption_key' => require getcwd() . '/data/oauth/encryption.key',
+        'access_token_expire'  => 'P1D',
+        'refresh_token_expire' => 'P1M',
+        'auth_code_expire'     => 'PT10M',
+        'pdo' => [
+            'dsn' => 'mysql:host=' . $dbParams['database']['host'] . ';dbname=' . $dbParams['database']['dbname'],
+            'username' => $dbParams['database']['user'],
+            'password' => $dbParams['database']['password']
+        ]
+    ],
+
+    'doctrine' => [
+        'connection' => [
+            'orm_default' => [
+                'params' => $dbParams['database']
+            ]
+        ]
+    ],
+
+    'uploads' => [
+        'user' => [
+            'url'  => 'http://localhost:8080/uploads/user',
+            'path' => \realpath(__DIR__ . '/../../public/uploads/user'),
+        ]
+    ],
+
+    'cors' => [
+        'origin' => ['*'],
+        'methods' => ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
+        'headers.allow' => ['Accept', 'Content-Type', 'Authorization'],
+        'headers.expose' => [],
+        'credentials' => false,
+        'cache' => 0,
+        'error' => [
+            \App\Cors\Factory\CorsFactory::class, 'error'
+        ]
+    ],
+];
